@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="module" src="index.js"></script>
+  </head>
+  <body>
+
+  <h1>&lt;media-playlist&gt;</h1>
+
+  <media-playlist loop>
+    <video src="http://techslides.com/demos/sample-videos/small.mp4" controls preload="none"></video>
+    <video src="http://vjs.zencdn.net/v/oceans.mp4" controls preload="none"></video>
+    <audio src="https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3" controls preload="none"></audio>
+  </media-playlist>
+
+  <br>
+  <!-- Simple buttons that use the media-playlist API -->
+  <button onclick="document.querySelector('media-playlist').previous()">Previous</button>
+  <button onclick="document.querySelector('media-playlist').next()">Next</button>
+
+  </body>
+</html>
