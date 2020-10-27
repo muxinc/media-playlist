@@ -28,8 +28,7 @@
   ],
   "author": "@heff",
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "np": "^6.2.0"
   }
