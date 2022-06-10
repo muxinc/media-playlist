@@ -1,3 +1,5 @@
+// import CustomVideoElement from 'custom-video-element';
+
 const template = document.createElement('template');
 
 template.innerHTML = `
@@ -21,10 +23,16 @@ template.innerHTML = `
   display: block;
 }
 </style>
-<div class="container">
-  <slot></slot>
+<div id="container">
+  
 </div>
 `;
+
+class MediaPlaylistItem extends HTMLElement {};
+
+if (!window.customElements.get('media-playlist-item')) {
+  window.customElements.define('media-playlist-item', MediaPlaylistItem);
+}
 
 class MediaPlaylist extends HTMLElement {
   constructor() {
@@ -32,6 +40,7 @@ class MediaPlaylist extends HTMLElement {
 
     var shadow = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this._container = this.querySelector('#container');
 
     this.handleCurrentEnded = () => {
       this.next();
@@ -40,68 +49,85 @@ class MediaPlaylist extends HTMLElement {
 
   connectedCallback() {
     // Select the first media element in the list
-    this.currentMedia = this.querySelector('video,audio');
+    // this.currentMedia = this.querySelector('video,audio,media-playlist-item');
+    this.currentItem = this.querySelector('media-playlist-item');
   }
   disconnectedCallback() {}
 
-  get currentMedia() {
-    return this._currentMedia || null;
+  get currentItem() {
+    return this.querySelector('media-playlist-item[current]') || null;
   }
 
-  set currentMedia(mediaElement) {
-    let currentMedia = this.currentMedia;
+  set currentItem(playlistItem) {
+    let currentItem = this.currentItem;
 
     // Tear down the previous media element
-    if (currentMedia) {
-      currentMedia.removeAttribute('current');
-      currentMedia.removeEventListener('ended', this.handleCurrentEnded);
+    if (currentItem) {
+      let currentMedia = this.shadowRoot.querySelector('#currentMedia');
+
       currentMedia.pause();
-      currentMedia.currentTime = 0;
+      currentMedia.removeEventListener('ended', this.handleCurrentEnded);
+      this._container.innerHTML = '';
+      currentItem.removeAttribute('current');
     }
 
-    // Load the supplied media element
-    currentMedia = mediaElement;
-    if (currentMedia) {
-      currentMedia.setAttribute('current', '');
-      currentMedia.addEventListener('ended', this.handleCurrentEnded);
-    }
+    // Load the new playlist item
+    currentItem = playlistItem;
 
-    this._currentMedia = currentMedia;
+    if (playlistItem) {
+      const mediaElement = document.createElement(playlistItem.getAttribute('type'));
+      mediaElement.id = "currentMedia";
+      mediaElement.src = playlistItem.getAttribute('src');
+      mediaElement.addEventListener('ended', this.handleCurrentEnded);
+      this._container.appendChild(mediaElement);
+
+      playlistItem.setAttribute('current', '');
+    }
   }
 
   next() {
     // Get all media elements and convert to an array
-    var medias = Array.prototype.slice.call(this.querySelectorAll('video,audio'));
-    var nextSib = medias[medias.indexOf(this.currentMedia) + 1];
+    var items = Array.prototype.slice.call(this.querySelectorAll('media-playlist-item'));
+    var nextSib = items[items.indexOf(this.currentItem) + 1];
 
     // If looping get the first
     if (!nextSib && this.getAttribute('loop') !== null) {
-      nextSib = medias[0];
+      nextSib = items[0];
     }
 
     if (nextSib) {
-      this.currentMedia = nextSib;
-      nextSib.play();
+      this.currentItem = nextSib;
+      this.play();
     } else {
-      this.currentMedia = null;
+      this.currentItem = null;
       this.dispatchEvent(new Event('ended'));
     }
   }
 
   previous() {
     // Get all media elements and convert to an array
-    var medias = Array.prototype.slice.call(this.querySelectorAll('video,audio'));
-    var prevSib = medias[medias.indexOf(this.currentMedia) - 1];
+    var items = Array.prototype.slice.call(this.querySelectorAll('media-playlist-item'));
+    var prevSib = items[items.indexOf(this.currentItem) - 1];
 
     // If looping get the first
     if (!prevSib && this.getAttribute('loop') !== null) {
-      prevSib = medias[medias.length - 1];
+      prevSib = items[items.length - 1];
     }
 
     if (prevSib) {
-      this.currentMedia = prevSib;
-      prevSib.play();
+      this.currentItem = prevSib;
+      this.play();
     }
+  }
+
+  play() {
+    const media = this.shadowRoot.querySelector('#currentMedia');
+    if (media) media.play();
+  }
+
+  pause() {
+    const media = this.shadowRoot.querySelector('#currentMedia');
+    if (media) media.pause();
   }
 }
 
