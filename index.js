@@ -5,27 +5,20 @@ const template = document.createElement('template');
 template.innerHTML = `
 <style>
 :host {
-  display: inline-block;
+  display: block;
   position: relative;
   min-width: 450px;
   min-height: 300px;
-  background: linear-gradient(135deg, #333 0%, #000 100%);
 }
 
-::slotted(video), ::slotted(audio) {
-  display: none;
+#currentMedia {
   position: absolute;
   width: 100%;
   height: 100%;
 }
-
-::slotted(video[current]), ::slotted(audio[current]) {
-  display: block;
-}
 </style>
-<div id="container">
-  
-</div>
+
+<div id="container"></div>
 `;
 
 class MediaPlaylistItem extends HTMLElement {};
@@ -40,7 +33,6 @@ class MediaPlaylist extends HTMLElement {
 
     var shadow = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this._container = this.querySelector('#container');
 
     this.handleCurrentEnded = () => {
       this.next();
@@ -51,7 +43,11 @@ class MediaPlaylist extends HTMLElement {
     // Select the first media element in the list
     // this.currentMedia = this.querySelector('video,audio,media-playlist-item');
     this.currentItem = this.querySelector('media-playlist-item');
+    if (this.getAttribute('autoplay')) {
+      this.play();
+    }
   }
+
   disconnectedCallback() {}
 
   get currentItem() {
@@ -67,7 +63,7 @@ class MediaPlaylist extends HTMLElement {
 
       currentMedia.pause();
       currentMedia.removeEventListener('ended', this.handleCurrentEnded);
-      this._container.innerHTML = '';
+      this.shadowRoot.querySelector('#container').innerHTML = '';
       currentItem.removeAttribute('current');
     }
 
@@ -79,7 +75,8 @@ class MediaPlaylist extends HTMLElement {
       mediaElement.id = "currentMedia";
       mediaElement.src = playlistItem.getAttribute('src');
       mediaElement.addEventListener('ended', this.handleCurrentEnded);
-      this._container.appendChild(mediaElement);
+
+      this.shadowRoot.querySelector('#container').appendChild(mediaElement);
 
       playlistItem.setAttribute('current', '');
     }
@@ -120,15 +117,29 @@ class MediaPlaylist extends HTMLElement {
     }
   }
 
+  get _currentMedia() {
+    return this.shadowRoot.querySelector('#currentMedia');
+  }
+
   play() {
-    const media = this.shadowRoot.querySelector('#currentMedia');
-    if (media) media.play();
+    this._currentMedia && this._currentMedia.play();
   }
 
   pause() {
-    const media = this.shadowRoot.querySelector('#currentMedia');
-    if (media) media.pause();
+    this._currentMedia && this._currentMedia.pause();
   }
+
+  get currentTime() {
+    return this._currentMedia && this._currentMedia.pause() || 0;
+  }
+
+  set currentTime(time) {
+    this._currentMedia && (this._currentMedia.currentTime = time);
+  }
+}
+
+function getCurrentMedia(playlist) {
+  return playlist.shadowRoot.querySelector('#currentMedia');
 }
 
 if (!window.customElements.get('media-playlist')) {
