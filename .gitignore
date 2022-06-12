@@ -1,4 +1,6 @@
 .DS_Store
+sandbox/*
+dist
 
 # Logs
 logs
