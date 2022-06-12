@@ -1,12 +1,12 @@
-// import CustomVideoElement from 'custom-video-element';
-
+// Document HTML Video API
+// Consider moving to its own project for shared use
 const HTML_VIDEO_EVENTS = [
   'abort',
   'canplay',
   'canplaythrough',
   'durationchange',
   'emptied',
-  // 'ended',
+  'ended',
   'error',
   'loadeddata',
   'loadedmetadata',
@@ -24,6 +24,118 @@ const HTML_VIDEO_EVENTS = [
   'volumechange',
   'waiting',
 ];
+
+const HTML_VIDEO_PROPS = {
+  addTextTrack: {
+    type: 'function',
+  },
+  audioTracks: {
+    type: 'object',
+    readOnly: true,
+  },
+  autoplay: {
+    type: 'boolean',
+  },
+  buffered: {
+    type: 'object',
+    readOnly: true,
+  },
+  canPlayType: {
+    type: 'function',
+    default: '',
+  },
+  controls: {
+    type: 'boolean',
+  },
+  crossOrigin: {
+    type: 'string',
+  },
+  currentSrc: {
+    type: 'string',
+    readOnly: true,
+  },
+  currentTime: {
+    type: 'number',
+    default: 0,
+  },
+  defaultMuted: {
+    type: 'boolean',
+  },
+  duration: {
+    type: 'number',
+    readOnly: true,
+    default: NaN,
+  },
+  fastSeek: {
+    type: 'function',
+  },
+  load: {
+    type: 'function',
+  },
+  networkState: {
+    type: 'number',
+    readOnly: true,
+    default: 0,
+  },
+  pause: {
+    type: 'function',
+  },
+  paused: {
+    type: 'boolean',
+    readOnly: true,
+    default: true,
+  },
+  play: {
+    type: 'function',
+  },
+  playbackRate: {
+    type: 'number',
+  },
+  played: {
+    type: 'object',
+    readOnly: true,
+  },
+  poster: {
+    type: 'string',
+    default: '',
+  },
+  preload: {
+    type: 'string',
+    default: 'metadata',
+  },
+  readyState: {
+    type: 'number',
+    readOnly: true,
+    default: 0,
+  },
+  seekable: {
+    type: 'object',
+    readOnly: true,
+  },
+  src: {
+    type: 'string',
+  },
+  textTracks: {
+    type: 'object',
+    readOnly: true,
+  },
+  videoHeight: {
+    type: 'number',
+    readOnly: true,
+  },
+  videoWidth: {
+    type: 'number',
+    readOnly: true,
+  },
+  videoTracks: {
+    type: 'object',
+    readOnly: true,
+  },
+  volume: {
+    type: 'number',
+    default: 1,
+  },
+};
 
 const template = document.createElement('template');
 
@@ -46,6 +158,7 @@ template.innerHTML = `
 <div id="container"></div>
 `;
 
+// Define a playlist item element
 class MediaPlaylistItem extends HTMLElement {};
 
 if (!window.customElements.get('media-playlist-item')) {
@@ -62,8 +175,8 @@ class MediaPlaylist extends HTMLElement {
 
   connectedCallback() {
     // Select the first media element in the list
-    // this.currentMedia = this.querySelector('video,audio,media-playlist-item');
     this.currentItem = this.querySelector('media-playlist-item');
+
     if (this.getAttribute('autoplay')) {
       this.play();
     }
@@ -105,7 +218,10 @@ class MediaPlaylist extends HTMLElement {
       mediaElement.id = 'currentMedia';
 
       // Copy attrs from the playlist item to the media
-      mediaElement.src = playlistItem.getAttribute('src');
+      for (let i = 0, len = playlistItem.attributes.length; i < len; i++) {
+        const attr = playlistItem.attributes[i];
+        mediaElement.setAttribute(attr.nodeName, attr.value);
+      }
 
       // Store event handlers on the media for later removal
       mediaElement.playlistEventHandlers = [];
@@ -118,12 +234,21 @@ class MediaPlaylist extends HTMLElement {
       mediaElement.playlistEventHandlers.push(['ended', endedHandler]);
 
       HTML_VIDEO_EVENTS.forEach((eventName)=>{
+        // Special case ended
+        if (eventName === 'ended') return;
+
         const handler = (event) => {
           this.dispatchEvent(new CustomEvent(eventName));
         };
 
         mediaElement.addEventListener(eventName, handler, false);
         mediaElement.playlistEventHandlers.push([eventName, handler]);
+      });
+
+      // Copy children of playlist item to media
+      playlistItem.childNodes.forEach((node) => {
+        const copiedNode = node.cloneNode(true);
+        mediaElement.appendChild(copiedNode);
       });
 
       // Append the media element to the shadow dom
@@ -194,114 +319,6 @@ class MediaPlaylist extends HTMLElement {
   set src(value) {}
 }
 
-// Document HTML Video API
-const HTML_VIDEO_PROPS = {
-  addTextTrack: {
-    isFunction: true,
-  },
-  audioTracks: {
-    readOnly: true
-  },
-  autoplay: {
-    type: 'boolean',
-  },
-  buffered: {
-    readOnly: true,
-  },
-  canPlayType: {
-    isFunction: true,
-    type: 'string',
-    default: '',
-  },
-  controls: {
-    type: 'boolean',
-  },
-  crossOrigin: {
-    type: 'string',
-  },
-  currentSrc: {
-    readOnly: true,
-  },
-  currentTime: {
-    type: 'number',
-    default: 0,
-  },
-  defaultMuted: {
-    type: 'boolean',
-  },
-  duration: {
-    readOnly: true,
-    default: NaN,
-  },
-  fastSeek: {
-    isFunction: true,
-  },
-  load: {
-    isFunction: true,
-  },
-  networkState: {
-    readOnly: true,
-    type: 'number',
-    default: 0,
-  },
-  pause: {
-    isFunction: true,
-  },
-  paused: {
-    readOnly: true,
-    type: 'boolean',
-    default: true,
-  },
-  play: {
-    isFunction: true,
-  },
-  playbackRate: {
-    type: 'number',
-  },
-  played: {
-    readOnly: true,
-    type: 'object',
-  },
-  poster: {
-    type: 'string',
-    default: '',
-  },
-  preload: {
-    type: 'string',
-    default: 'metadata',
-  },
-  readyState: {
-    readOnly: true,
-    type: 'number',
-    default: 0,
-  },
-  seekable: {
-    readOnly: true,
-    type: 'object',
-  },
-  src: {
-    type: 'string',
-  },
-  textTracks: {
-    readOnly: true,
-    type: 'object',
-  },
-  videoHeight: {
-    readOnly: true,
-  },
-  videoWidth: {
-    readOnly: true,
-  },
-  videoTracks: {
-    readOnly: true,
-    type: 'object',
-  },
-  volume: {
-    type: 'number',
-    default: 1,
-  },
-}
-
 function getCurrentMedia(playlist) {
   return playlist.shadowRoot.querySelector('#currentMedia');
 }
@@ -314,7 +331,7 @@ Object.keys(HTML_VIDEO_PROPS).forEach(propName=>{
   if (MediaPlaylist.prototype[propName]) return;
 
   // Function
-  if (propDetails.isFunction) {
+  if (propDetails.type == 'function') {
     MediaPlaylist.prototype[propName] = function() {
       const media = getCurrentMedia(this);
       return media[propName].apply(media, arguments);

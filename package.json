@@ -29,9 +29,7 @@
   ],
   "author": "@heff",
   "license": "MIT",
-  "dependencies": {
-    "custom-video-element": "^0.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "np": "^6.2.0",
     "@rollup/plugin-commonjs": "^11.0.2",
