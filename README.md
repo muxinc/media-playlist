@@ -1,20 +1,20 @@
 # `<media-playlist>`
 
-A custom element for playing through a set of audio and video elements.
+A custom element for playing through a set of audio and/or video elements.
 
 ## Example
 
 ```html
 <html>
 <head>
-  <script type="module" src="https://unpkg.com/media-playlist"></script>
+  <script type="module" src="https://unpkg.com/media-playlist@0.1"></script>
 </head>
 <body>
 
 <media-playlist loop>
-  <video src="" controls></video>
-  <audio src="" controls></audio>
-  <video src="" controls></video>
+  <media-playlist-item type="video" src="" controls></media-playlist-item>
+  <media-playlist-item type="audio" src="" controls></media-playlist-item>
+  <media-playlist-item type="video" src="" controls></media-playlist-item>
 </media-playlist>
 
 </body>
@@ -33,7 +33,7 @@ Note the `type="module"`, that's important.
 
 ```html
 <head>
-  <script type="module" src="https://unpkg.com/media-playlist"></script>
+  <script type="module" src="https://unpkg.com/media-playlist@0.1"></script>
 </head>
 ```
 
