@@ -220,6 +220,10 @@ class MediaPlaylist extends HTMLElement {
       // Copy attrs from the playlist item to the media
       for (let i = 0, len = playlistItem.attributes.length; i < len; i++) {
         const attr = playlistItem.attributes[i];
+
+        // skip type attr as that's special for media-playlist-item
+        if (attr.nodeName === 'type') continue;
+
         mediaElement.setAttribute(attr.nodeName, attr.value);
       }
 
@@ -311,10 +315,10 @@ class MediaPlaylist extends HTMLElement {
   set defaultPlaybackRate(value) {}
 
   get ended() {}
-  
+
   get muted() {}
   set muted(value) {}
-  
+
   get src() {}
   set src(value) {}
 }

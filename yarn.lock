@@ -987,11 +987,6 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
-custom-video-element@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/custom-video-element/-/custom-video-element-0.0.2.tgz#aead266cef4ad6bc046e269472744ff76e4d7e43"
-  integrity sha512-kkuWKjaHZfy6lVwNlbjbgbXxkQLsPbCARUwDiZyfdPQ2nbDJMuuaQUWDUpxhpkc3b3M30eqxjHbz86gfQyL9aQ==
-
 date-fns@^1.27.2:
   version "1.30.1"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
