@@ -1,6 +1,6 @@
 {
   "name": "media-playlist",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Play through a set of video and audio elements.",
   "type": "module",
   "main": "dist/media-playlist.js",
